@@ -1,33 +1,10 @@
 #!/bin/bash
-# Check mail.conf and set curl's mailing settings accordingly
-echo "Setting up Mailing configs"
+MailFrom=""
+MailTo=""
+MailServ=""
+MailPass=""
+MailPort=""
 
-MailFrom=
-MailTo=
-MailServ=
-MailPort=
-MailProtocol="smtps"
-MailProtocolReq="--ssl-reqd"
-
-# Check pass.conf and set the password accordingly
-MailPass=
-
-
-# Check if updater is active and fetch it's configs
-
-# Need to implement updater
-
-
-# Fetch package list
-PackageList=
-
-
-# Error catch
-
-# Misconfigurations
-
-
-# Fetch package versions
 echo "Checking latest VS current version"
 UpdAte="There is an update for :"
 
@@ -55,8 +32,6 @@ CurrentMailcow=$(cat package-version/mailcow-v)
 LatestCrafty=$(curl -s https://gitlab.com/api/v4/projects/20430749/releases/ | jq '.[]' | jq -r '.name' | head -1 | awk '{print substr($2, 1) }')
 CurrentCrafty=$(cat package-version/crafty-v)
 
-
-# Check if there is updates then set the new version locally if there is
 echo "Fetched latest versions"
 
 if [ "${CurrentTail}" != "${LatestTail}" ] ; then
@@ -118,14 +93,9 @@ if [ "${CurrentCrafty}" != "${LatestCrafty}" ] ; then
 
 fi
 
-
-# Check if there was an update and send the email if there was
-
 if [ "${UpdAte}" != "There is an update for :" ] ; then
 
-	# Need to implement the updater
-
-	curl --url $MailProtocol'://'$MailServ':'$MailPort $MailProtocolReq --mail-from $MailFrom --mail-rcpt $MailTo --user $MailFrom':'$MailPass -T <(echo -e 'From:'$MailFrom'\nTo:'$MailTo'\nSubject:PUCA - Package Update Checker Alert\n\n'$UpdAte)
+	curl --url 'smtps://'$MailServ':'$MailPort --ssl-reqd --mail-from $MailFrom --mail-rcpt $MailTo --user $MailFrom':'$MailPass -T <(echo -e 'From:'$MailFrom'\nTo:'$MailTo'\nSubject:PUCA - Package Update Checker Alert\n\n'$UpdAte)
 	echo "List of package to update sent :"
 	echo -e $UpdAte
 

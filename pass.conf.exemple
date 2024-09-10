@@ -1,0 +1,18 @@
+# It's strongly recommended to set 'askmailpass' to 'yes' (for manual start)
+#    or 'file' (for automatic launch)
+# 'no' will use the password in clear text given below, this is strongly not recommanded
+# Default : 'yes'
+askmailpass="yes"
+
+# If 'askmailpass' is set to 'file', this value is where the script will look at
+# Complete path is recommanded
+# Make sure the file is only readable and only available for the user
+#    launching the script
+# Default : 'NONE'
+mailpassfile="NONE"
+
+# If 'askmailpass' is not set to 'no', the value below won't be taken into account
+# This is strongly not recommended and is supported only for test purposes
+# Default : 'NONE'
+mailpass="NONE"
+

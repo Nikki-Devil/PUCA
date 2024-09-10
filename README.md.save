@@ -11,19 +11,17 @@ Current Alpha isn't working as a rewrite of the Curl command was done and all th
 
 
 ## Planned features :
-- Config fetching
-- Mail settings fetched from config file
+- Mail settings fetch from config file
+- Password variable setting in config file
 	- Ask mail password / file or config mail password fetching
 - Iterator instead of separated if for package list
+- Config fetching
 
-## Planned for later :
-- Auto-Updater
-	- Self-application (apt)
-	- SSH Linux support (apt)
-        	- SSH config fetcher
-	        	- SSH Key fetching
-			- Package/server config fetching
-	- Support for different linux package manager ? (snap, flatpak)
-	- SSH Windows support ? (winget, chocolatey)
-	- Support for FreeBSD based OS (pkg)
-- Default package config file list
+
+
+Optional :
+Ssh updater
+        - SSH Key
+        - Json/txt package/server/Key file parsing
+        - On/Off ssh updates
+        (- Windows support + package manager option ?)

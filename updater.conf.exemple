@@ -1,0 +1,14 @@
+# If you want to auto-update when PUCA detect an update, set this to yes
+# You will need to set the SSHfolder
+# Default : 'no'
+Active="no"
+
+# Config folder with ssh configs
+# Full path recommended
+# Default : 'NONE'
+SSHfolder="NONE"
+
+# SSH port, you likely need to change this
+# Default : '22'
+SSHport="22"
+
