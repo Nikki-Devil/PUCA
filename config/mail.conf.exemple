@@ -17,6 +17,6 @@ MailPort="465"
 
 # Set to 'yes' if no ssl/tls is configured
 # You also certainly need to change the port if setting this to 'yes'
-# This is strongly not recommanded
+# This is highly unrecommended
 # Default : 'no'
 UnsecureMail=no

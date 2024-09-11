@@ -2,10 +2,23 @@
 # Check mail.conf and set curl's mailing settings accordingly
 echo "Setting up Mailing configs"
 
-MailFrom=
-MailTo=
-MailServ=
-MailPort=
+UpdAte="There is an update for :"
+MailFrom=$( cat config/mail.conf | grep MailFrom | cut -d \" -f 2)
+MailTo=$( cat config/mail.conf | grep MailTo | cut -d \" -f 2)
+MailServ=$( cat config/mail.conf | grep MailServ | cut -d \" -f 2)
+MailPort=$( cat config/mail.conf | grep MailPort | cut -d \" -f 2)
+
+isUnsecure=$( cat config/mail.conf | grep UnsecureMail | cut -d \" -f 2)
+
+if [ "${isUnsecure}" = "yes" ] ; then
+
+        echo "This is highly unrecommended"
+        UpdAte=$UpdAte"\nTailscale : "${CurrentTail}" -> "${LatestTail}
+
+        echo $LatestTail > tailscale-v
+
+fi
+
 MailProtocol="smtps"
 MailProtocolReq="--ssl-reqd"
 
@@ -19,17 +32,22 @@ MailPass=
 
 
 # Fetch package list
+echo "Setting package list"
 PackageList=
+PackageLink=
+PackageCurlEnd=
+PackageMessage=
+PackageCurrentVersion=
+
+
+# Fetch latest releases
+echo "Fetch latest releases"
 
 
 # Error catch
 
 # Misconfigurations
 
-
-# Fetch package versions
-echo "Checking latest VS current version"
-UpdAte="There is an update for :"
 
 # Tailscale
 LatestTail=$(curl https://api.github.com/repos/tailscale/tailscale/releases/latest -s | grep 'tag_name' | awk '{print substr($2, 2, length($2)-3) }')

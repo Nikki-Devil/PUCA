@@ -1,6 +1,6 @@
 # It's strongly recommended to set 'askmailpass' to 'yes' (for manual start)
 #    or 'file' (for automatic launch)
-# 'no' will use the password in clear text given below, this is strongly not recommanded
+# 'no' will use the password in clear text given below, this is highly unrecommended
 # Default : 'yes'
 askmailpass="yes"
 
@@ -12,7 +12,7 @@ askmailpass="yes"
 mailpassfile="NONE"
 
 # If 'askmailpass' is not set to 'no', the value below won't be taken into account
-# This is strongly not recommended and is supported only for test purposes
+# This is highly unrecommended and is supported only for test purposes
 # Default : 'NONE'
 mailpass="NONE"
 
