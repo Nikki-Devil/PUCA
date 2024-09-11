@@ -1,0 +1,8 @@
+{
+	"RevancedManager": {
+		"link": "https://api.github.com/repos/ReVanced/revanced-manager/releases/latest",
+		"curlend": "-s | grep 'tag_name' | awk '{print substr($2, 2, length($2)-3) }')"
+		"message": "Revanced Manager : "
+		"currentversion": "NONE"
+  }
+}

@@ -12,18 +12,62 @@ isUnsecure=$( cat config/mail.conf | grep UnsecureMail | cut -d \" -f 2)
 
 if [ "${isUnsecure}" = "yes" ] ; then
 
-        echo "This is highly unrecommended"
-        UpdAte=$UpdAte"\nTailscale : "${CurrentTail}" -> "${LatestTail}
+	echo -e "\033[38;5;9mMail server connexion is set to unsecure. No SSL/TLS encryption will be done\nThis is highly unrecommended\033[0m"
+        MailProtocol="smtp"
+	MailProtocolReq=""
 
-        echo $LatestTail > tailscale-v
+elif [ "${isUnsecure}" = "no" ] ; then
+
+	echo "Mail server connexion will use SSL/TLS encryption"
+	MailProtocol="smtps"
+	MailProtocolReq="--ssl-reqd"
+
+# Misconfig error
+else
+
+	echo -e "\033[38;5;9mError MisSec : UnsecureMail is misconfigured or not set.\nSSL/TLS encryption will then be used as default\033[0m"
+	MailProtocol="smtps"
+	MailProtocolReq="--ssl-reqd"
 
 fi
 
-MailProtocol="smtps"
-MailProtocolReq="--ssl-reqd"
 
 # Check pass.conf and set the password accordingly
-MailPass=
+AskMailPass=$( cat config/pass.conf | grep "askmailpass=" | cut -d \" -f 2)
+
+if [ "${AskMailPass}" = "yes" ] ; then
+
+        echo "What's the email password ?"
+        read MailPass
+
+elif [ "${AskMailPass}" = "no" ] ; then
+
+	echo -e "\033[38;5;9mThe password of the sender's email will taken from the config\nThis is highly unrecommended as it's unsecure\033[0m"
+	MailPass=$( cat config/pass.conf | grep "mailpass=" | cut -d \" -f 2 | tail -1 )
+
+elif  [ "${AskMailPass}" = "file" ] ; then
+
+	echo "Fetching password"
+	PassPath=$( cat config/pass.conf | grep "mailpassfile=" | cut -d \" -f 2)
+
+	if test -f $PassPath ; then
+		echo "File exists"
+		MailPass=$( cat $PassPath )
+
+	else
+
+		echo -e "\033[38;5;9mThe file doesn't exist.\nThe password will be set to 'NONE'\033[0m"
+		MailPass="NONE"
+
+	fi
+
+# Misconfig error
+else
+
+        echo -e "\033[38;5;9mError MisAskPass : pass.conf is misconfigured.\nThe password will be set to 'NONE'\033[0m"
+	MailPass="NONE"
+
+fi
 
 
 # Check if updater is active and fetch it's configs
@@ -36,7 +80,7 @@ echo "Setting package list"
 PackageList=
 PackageLink=
 PackageCurlEnd=
-PackageMessage=
+BPackageMessage=
 PackageCurrentVersion=
 
 
@@ -45,8 +89,9 @@ echo "Fetch latest releases"
 
 
 # Error catch
-
 # Misconfigurations
+
+exit
 
 
 # Tailscale
