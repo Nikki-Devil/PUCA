@@ -1,1 +1,8 @@
-v1.72.1/v1.72.1
+{
+        "TailscaleOPN": {
+                "link": "https://raw.githubusercontent.com/opnsense/ports/master/security/tailscale/distinfo",
+                "curlend": "-s | grep 'SIZE' | grep '.zip' | awk '{print substr($2, 34, length($2)-38) }')"
+                "message": "OPNsense's Tailscale : "
+                "currentversion": "NONE"
+  }
+}

@@ -1,1 +1,8 @@
-v1.73.1*
+{
+        "TailscaleAndroid": {
+                "link": "https://raw.githubusercontent.com/tailscale/tailscale-android/main/android/build.gradle",
+                "curlend": "-s | grep 'versionName' | awk '{print substr($2, 2, length($2)-28) }')'*'"
+                "message": "Android's Tailscale : "
+                "currentversion": "NONE"
+  }
+}
