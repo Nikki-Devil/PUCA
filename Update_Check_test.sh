@@ -71,16 +71,34 @@ else
 fi
 
 
-# Check if updater is active and fetch it's configs
+# Check if updater is active and fetch it's configs $**$
 
 # Need to implement updater
 
 
 # Fetch package list
-echo "Setting package list :"
+echo "Setting package list"
 PackageList=''
 PackageCounter=0
 declare -A PackageArrays
+
+
+# Might add an error handler function to replace every exiting errors in the future $**$
+if [[ ! -d "$PackageListPath" ]]; then
+
+	echo -e "\033[38;5;9mError MisListPath : The package list folder doesn't exist."
+	read -t 300 -p "The script will exit in 5 min or when a key is pressed."
+	echo -e "Exiting with error MisListPath...\033[0m"
+	exit
+
+elif [[ -z "$(ls -A "$PackageListPath" 2>/dev/null)" ]]; then
+
+        echo -e "\033[38;5;9mError MisListFiles : The package list folder is empty."
+        read -t 300 -p "The script will exit in 5 min or when a key is pressed."
+        echo -e "Exiting with error MisListFiles...\033[0m"
+        exit
+
+fi
 
 for JsonFiles in "$PackageListPath"* ; do
 
@@ -90,122 +108,52 @@ for JsonFiles in "$PackageListPath"* ; do
 		PackageArrays["$PackageCounter:$JsonKey"]="$ValueOfKey"
 	done
 
-	echo PackageArrays["$PackageCounter:$JsonKey"]="$ValueOfKey"
-	echo "PackageArrays["$PackageCounter:$JsonKey"]="$ValueOfKey""
-
 	PackageCounter=$((PackageCounter + 1))
 
 done
 
-echo "Total packages processed : "$((PackageCounter + 1))
+echo "Total packages processed : "$((PackageCounter))
 
-echo "Package 1 details:"
-for JsonKey in "${JsonKeys[@]}"; do
-	echo "PackageArrays[1:$JsonKey] = ${PackageArrays["1:$JsonKey"]}"
+# Gets PackageCounter from 1 to xIterations to 0 to x-1Iterations for next loops
+PackageCounter=$((PackageCounter - 1))
+
+# Debug test
+#echo "Package 1 details:"
+#for JsonKey in "${JsonKeys[@]}"; do
+#	echo "PackageArrays[1:$JsonKey] = ${PackageArrays["1:$JsonKey"]}"
+#done
+#
+#echo "Package 5 details:"
+#for JsonKey in "${JsonKeys[@]}"; do
+#        echo "PackageArrays[5:$JsonKey] = ${PackageArrays["5:$JsonKey"]}"
+#done
+
+
+# Fetch latest release and compare it
+echo "Fetch latest release and compare it"
+for ((i=0; i<counter; i++)); do
+
+	link="${PackageArrays["$i:link"]}"
+	curlend="${PackageArrays["$i:curlend"]}"
+	version="${PackageArrays["$i:version"]}"
+	name="${PackageArrays["$i:name"]}"
+	latest=$(curl -s "$link" $curlend)
+
+	echo "Current : $version ; Latest : $latest"
+
+	# Compare
+	if [ "$latest" != "$version" ]; then
+		echo "Update detected for package : $name"
+
+		UpdAte=$UpdAte"\n"${name}" : "${version}" -> "${latest}
+		PackageArrays["$i:version"]="$latest"
+
+	fi
+
 done
 
-echo "Package 5 details:"
-for JsonKey in "${JsonKeys[@]}"; do
-        echo "PackageArrays[5:$JsonKey] = ${PackageArrays["5:$JsonKey"]}"
-done
-
-# Fetch latest releases
-echo "Fetch latest releases"
-
-
-# Error catch
-# Misconfigurations
-
+echo -e $UpdAte
 exit
-
-
-# Tailscale
-LatestTail=$(curl https://api.github.com/repos/tailscale/tailscale/releases/latest -s | grep 'tag_name' | awk '{print substr($2, 2, length($2)-3) }')
-CurrentTail=$(cat package-version/tailscale-v)
-
-# Tailscale OPNsense
-LatestTailOPN=$(curl https://raw.githubusercontent.com/opnsense/ports/master/security/tailscale/distinfo -s | grep 'SIZE' | grep '.zip' | awk '{print substr($2, 34, length($2)-38) }')
-CurrentTailOPN=$(cat package-version/tailscaleOPN-v)
-
-# Tailscale Android
-LatestTailAnd='v'$(curl https://raw.githubusercontent.com/tailscale/tailscale-android/main/android/build.gradle -s | grep 'versionName' | awk '{print substr($2, 2, length($2)-28) }')'*'
-CurrentTailAnd=$(cat package-version/tailscaleAnd-v)
-
-# Tailscale PfSense
-LatestTailPF=$(curl https://raw.githubusercontent.com/freebsd/freebsd-ports/master/security/tailscale/distinfo -s | grep 'SIZE' | grep '.zip' | awk '{print substr($2, 34, length($2)-38) }')
-CurrentTailPF=$(cat package-version/tailscalePF-v)
-
-# Mailcow
-LatestMailcow=$(curl https://api.github.com/repos/mailcow/mailcow-dockerized/releases/latest -s | grep 'tag_name' | awk '{print substr($2, 2, length($2)-3) }')
-CurrentMailcow=$(cat package-version/mailcow-v)
-
-# Crafty Controller
-LatestCrafty=$(curl -s https://gitlab.com/api/v4/projects/20430749/releases/ | jq '.[]' | jq -r '.name' | head -1 | awk '{print substr($2, 1) }')
-CurrentCrafty=$(cat package-version/crafty-v)
-
-
-# Check if there is updates then set the new version locally if there is
-echo "Fetched latest versions"
-
-if [ "${CurrentTail}" != "${LatestTail}" ] ; then
-
-	echo "There is an update for Tailscale"
-	UpdAte=$UpdAte"\nTailscale : "${CurrentTail}" -> "${LatestTail}
-
-	echo $LatestTail > tailscale-v
-
-fi
-
-if [ "${CurrentTailOPN}" != "${LatestTailOPN}" ] ; then
-
-	echo "There is an update for OPNsense's Tailscale"
-	UpdAte=$UpdAte"\nOPNsense's Tailscale : "${CurrentTailOPN}" -> "${LatestTailOPN}
-
-
-	echo $LatestTailOPN > tailscaleOPN-v
-
-fi
-
-if [ "${CurrentTailAnd}" != "${LatestTailAnd}" ] ; then
-
-	echo "There is an update for Android's Tailscale"
-	UpdAte=$UpdAte"\nAndroid's Tailscale : "${CurrentTailAnd}" -> "${LatestTailAnd}
-
-
-	echo $LatestTailAnd > tailscaleAnd-v
-
-fi
-
-if [ "${CurrentTailPF}" != "${LatestTailPF}" ] ; then
-
-	echo "There is an update for PfSense's Tailscale"
-	UpdAte=$UpdAte"\nPfSense's Tailscale : "${CurrentTailPF}" -> "${LatestTailPF}
-
-
-	echo $LatestTailPF > tailscalePF-v
-
-fi
-
-if [ "${CurrentMailcow}" != "${LatestMailcow}" ] ; then
-
-	echo "There is an update for Mailcow"
-	UpdAte=$UpdAte"\nMailcow : "${CurrentMailcow}" -> "${LatestMailcow}
-
-
-	echo $LatestMailcow > mailcow-v
-
-fi
-
-if [ "${CurrentCrafty}" != "${LatestCrafty}" ] ; then
-
-	echo "There is an update for Crafty Controller"
-	UpdAte=$UpdAte"\nCrafty Controller : "${CurrentCrafty}" -> "${LatestCrafty}
-
-
-	echo $LatestCrafty > crafty-v
-
-fi
-
 
 # Check if there was an update and send the email if there was
 
