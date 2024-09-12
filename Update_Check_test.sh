@@ -58,7 +58,7 @@ elif  [ "${AskMailPass}" = "file" ] ; then
 
 		echo -e "\033[38;5;9mError MisFilePass : The file doesn't exist.\nThe password will be set to 'NONE'\033[0m"
 		MailPass="NONE"
-B
+
 	fi
 
 # Misconfig error
@@ -82,21 +82,33 @@ PackageCounter=0
 for files in package-list/* ;
 
 	do echo $files ;
-	PackageList=$(echo -e $files"\n"$PackageList)
+#	PackageList=$(echo -e $files"\n"$PackageList)
+
+	typeset -A PackageArray
+	while IFS== read -r key value; do
+		PackageArray["$key"]="$value"
+	done < <(jq -r '.package | to_entries | .[] | .key + "=" + .value ' $files)
+	typeset -p PackageArray
+	echo -e "PackageLink = '${PackageArray[link]}'\n'$PackageLink'"
+	echo -e "PackageCurlEnd = '${PackageArray[curlend]}'\n'$PackageCurlEnd'"
+	echo -e "PackageMessage = '${PackageArray[message]}'\n'$PackageMessage'"
+	echo -e "PackageCurrentVersion = '${PackageArray[currentversion]}'\n'$PackageCurrentVersion"
+	echo -e "PackageFileSave = '$files'\n'$PackageFileSave'"
+
 	PackageCounter=$((PackageCounter + 1))
 
 done
 
-PackageLink=''
-PackageCurlEnd=''
-PackageMessage=''
-PackageCurrentVersion=''
-for filenumber in $PackageCounter ;
+#PackageLink=''
+#PackageCurlEnd=''
+#PackageMessage=''
+#PackageCurrentVersion=''
+#for filenumber in $PackageCounter ;
 
 #	PackageBreakdown=$(echo $(cat -e $PackageList))
 #	PackageLink=$(echo -e $(cat -e $PackageBreakdown)"\n"$PackageLink)
 
-done
+#done
 
 echo $PackageLink
 

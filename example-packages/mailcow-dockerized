@@ -1,8 +1,8 @@
 {
-        "MailcowDockerized": {
+        "package": {
                 "link": "https://api.github.com/repos/mailcow/mailcow-dockerized/releases/latest",
-                "curlend": "-s | grep 'tag_name' | awk '{print substr($2, 2, length($2)-3) }')"
-                "message": "Mailcow Dockerized : "
+                "curlend": "-s | grep 'tag_name' | awk '{print substr($2, 2, length($2)-3) }')",
+                "message": "Mailcow Dockerized : ",
                 "currentversion": "NONE"
   }
 }

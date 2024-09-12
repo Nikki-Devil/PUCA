@@ -1,8 +1,8 @@
 {
-	"Tailscale": {
+	"package": {
 		"link": "https://api.github.com/repos/tailscale/tailscale/releases/latest",
-		"curlend": "-s | grep 'tag_name' | awk '{print substr($2, 2, length($2)-3) }')"
-		"message": "Tailscale : "
+		"curlend": "-s | grep 'tag_name' | awk '{print substr($2, 2, length($2)-3) }')",
+		"message": "Tailscale : ",
 		"currentversion": "NONE"
   }
 }
