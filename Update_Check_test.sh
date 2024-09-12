@@ -7,6 +7,7 @@ MailFrom=$( cat config/mail.conf | grep MailFrom | cut -d \" -f 2)
 MailTo=$( cat config/mail.conf | grep MailTo | cut -d \" -f 2)
 MailServ=$( cat config/mail.conf | grep MailServ | cut -d \" -f 2)
 MailPort=$( cat config/mail.conf | grep MailPort | cut -d \" -f 2)
+PackageListPath=$( cat config/mail.conf | grep ListPath | cut -d \" -f 2)
 
 isUnsecure=$( cat config/mail.conf | grep UnsecureMail | cut -d \" -f 2)
 
@@ -79,39 +80,34 @@ fi
 echo "Setting package list :"
 PackageList=''
 PackageCounter=0
-for files in package-list/* ;
+declare -A PackageArrays
 
-	do echo $files ;
-#	PackageList=$(echo -e $files"\n"$PackageList)
+for JsonFiles in "$PackageListPath"* ; do
 
-	typeset -A PackageArray
-	while IFS== read -r key value ;
-		do PackageArray["$key"]="$value"
-		PackageArray["filename"]="$files"
-	done < <(jq -r '.package | to_entries | .[] | .key + "=" + .value ' $files)
-	typeset -p PackageArray
-	echo -e "PackageLink = '${PackageArray[link]}'\n'$PackageLink'"
-	echo -e "PackageCurlEnd = '${PackageArray[curlend]}'\n'$PackageCurlEnd'"
-	echo -e "PackageMessage = '${PackageArray[message]}'\n'$PackageMessage'"
-	echo -e "PackageCurrentVersion = '${PackageArray[currentversion]}'\n'$PackageCurrentVersion"
-	echo -e "PackageFileSave = '$files'\n'$PackageFileSave'"
+	JsonKeys=($(jq -r '.package | keys[]' "$JsonFiles"))
+	for JsonKey in "${JsonKeys[@]}"; do
+		ValueOfKey=$(jq -r ".package.$JsonKey" "$JsonFiles")
+		PackageArrays["$PackageCounter:$JsonKey"]="$ValueOfKey"
+	done
+
+	echo PackageArrays["$PackageCounter:$JsonKey"]="$ValueOfKey"
+	echo "PackageArrays["$PackageCounter:$JsonKey"]="$ValueOfKey""
 
 	PackageCounter=$((PackageCounter + 1))
 
 done
 
-#PackageLink=''
-#PackageCurlEnd=''
-#PackageMessage=''
-#PackageCurrentVersion=''
-#for filenumber in $PackageCounter ;
+echo "Total packages processed : "$((PackageCounter + 1))
 
-#	PackageBreakdown=$(echo $(cat -e $PackageList))
-#	PackageLink=$(echo -e $(cat -e $PackageBreakdown)"\n"$PackageLink)
+echo "Package 1 details:"
+for JsonKey in "${JsonKeys[@]}"; do
+	echo "PackageArrays[1:$JsonKey] = ${PackageArrays["1:$JsonKey"]}"
+done
 
-#done
-
-echo $PackageLink
+echo "Package 5 details:"
+for JsonKey in "${JsonKeys[@]}"; do
+        echo "PackageArrays[5:$JsonKey] = ${PackageArrays["5:$JsonKey"]}"
+done
 
 # Fetch latest releases
 echo "Fetch latest releases"
