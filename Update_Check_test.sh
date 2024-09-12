@@ -85,8 +85,9 @@ for files in package-list/* ;
 #	PackageList=$(echo -e $files"\n"$PackageList)
 
 	typeset -A PackageArray
-	while IFS== read -r key value; do
-		PackageArray["$key"]="$value"
+	while IFS== read -r key value ;
+		do PackageArray["$key"]="$value"
+		PackageArray["filename"]="$files"
 	done < <(jq -r '.package | to_entries | .[] | .key + "=" + .value ' $files)
 	typeset -p PackageArray
 	echo -e "PackageLink = '${PackageArray[link]}'\n'$PackageLink'"
