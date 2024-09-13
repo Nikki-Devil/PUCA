@@ -7,3 +7,6 @@ updater.conf
 *.pub
 *.key
 *-v
+
+## Ignore logs
+log

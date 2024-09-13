@@ -1,7 +1,18 @@
 #!/bin/bash
 # Check mail.conf and set curl's mailing settings accordingly
-echo "Setting up Mailing configs"
+RunningFolder=$(pwd)
+if [[ ! -d "RunningFolder/logs" ]]; then
 
+        mkdir "$RunningFolder/logs/"
+
+fi
+
+RunningDate=$(date "+%Y.%m.%d-%H:%M")
+LogFile=$(echo "logs/$RunningDate")
+
+echo "Setting up Mailing configs" >> $LogFile
+
+mkdir /tmp/PUCA/
 UpdAte="There is an update for :"
 MailFrom=$( cat config/mail.conf | grep MailFrom | cut -d \" -f 2)
 MailTo=$( cat config/mail.conf | grep MailTo | cut -d \" -f 2)
@@ -13,20 +24,20 @@ isUnsecure=$( cat config/mail.conf | grep UnsecureMail | cut -d \" -f 2)
 
 if [ "${isUnsecure}" = "yes" ] ; then
 
-	echo -e "\033[38;5;9mMail server connexion is set to unsecure. No SSL/TLS encryption will be done\nThis is highly unrecommended\033[0m"
+	echo -e "\033[38;5;9mMail server connexion is set to unsecure. No SSL/TLS encryption will be done\nThis is highly unrecommended\033[0m" >> $LogFile
         MailProtocol="smtp"
 	MailProtocolReq=""
 
 elif [ "${isUnsecure}" = "no" ] ; then
 
-	echo "Mail server connexion will use SSL/TLS encryption"
+	echo "Mail server connexion will use SSL/TLS encryption" >> $LogFile
 	MailProtocol="smtps"
 	MailProtocolReq="--ssl-reqd"
 
 # Misconfig error
 else
 
-	echo -e "\033[38;5;9mError MisSec : UnsecureMail is misconfigured or not set.\nSSL/TLS encryption will then be used as default\033[0m"
+	echo -e "\033[38;5;9mError MisSec : UnsecureMail is misconfigured or not set.\nSSL/TLS encryption will then be used as default\033[0m" >> $LogFile
 	MailProtocol="smtps"
 	MailProtocolReq="--ssl-reqd"
 
@@ -38,26 +49,27 @@ AskMailPass=$( cat config/pass.conf | grep "askmailpass=" | cut -d \" -f 2)
 
 if [ "${AskMailPass}" = "yes" ] ; then
 
+        echo "What's the email password ?" >> $LogFile
         echo "What's the email password ?"
         read MailPass
 
 elif [ "${AskMailPass}" = "no" ] ; then
 
-	echo -e "\033[38;5;9mThe password of the sender's email will taken from the config\nThis is highly unrecommended as it's unsecure\033[0m"
+	echo -e "\033[38;5;9mThe password of the sender's email will taken from the config\nThis is highly unrecommended as it's unsecure\033[0m" >> $LogFile
 	MailPass=$( cat config/pass.conf | grep "mailpass=" | cut -d \" -f 2 | tail -1 )
 
 elif  [ "${AskMailPass}" = "file" ] ; then
 
-	echo "Fetching password"
+	echo "Fetching password" >> $LogFile
 	PassPath=$( cat config/pass.conf | grep "mailpassfile=" | cut -d \" -f 2)
 
 	if test -f $PassPath ; then
-		echo "File exists"
+		echo "File exists" >> $LogFile
 		MailPass=$( cat $PassPath )
 
 	else
 
-		echo -e "\033[38;5;9mError MisFilePass : The file doesn't exist.\nThe password will be set to 'NONE'\033[0m"
+		echo -e "\033[38;5;9mError MisFilePass : The file doesn't exist.\nThe password will be set to 'NONE'\033[0m" >> $LogFile
 		MailPass="NONE"
 
 	fi
@@ -65,7 +77,7 @@ elif  [ "${AskMailPass}" = "file" ] ; then
 # Misconfig error
 else
 
-        echo -e "\033[38;5;9mError MisAskPass : pass.conf is misconfigured.\nThe password will be set to 'NONE'\033[0m"
+        echo -e "\033[38;5;9mError MisAskPass : pass.conf is misconfigured.\nThe password will be set to 'NONE'\033[0m" >> $LogFile
 	MailPass="NONE"
 
 fi
@@ -77,7 +89,7 @@ fi
 
 
 # Fetch package list
-echo "Setting package list"
+echo "Setting package list" >> $LogFile
 PackageList=''
 PackageCounter=0
 declare -A PackageArrays
@@ -86,6 +98,9 @@ declare -A PackageArrays
 # Might add an error handler function to replace every exiting errors in the future $**$
 if [[ ! -d "$PackageListPath" ]]; then
 
+	echo -e "\033[38;5;9mError MisListPath : The package list folder doesn't exist." >> $LogFile
+	echo -e "The script will exit in 5 min or when a key is pressed." >> $LogFile
+	echo -e "Exiting with error MisListPath...\033[0m" >> $LogFile
 	echo -e "\033[38;5;9mError MisListPath : The package list folder doesn't exist."
 	read -t 300 -p "The script will exit in 5 min or when a key is pressed."
 	echo -e "Exiting with error MisListPath...\033[0m"
@@ -93,6 +108,9 @@ if [[ ! -d "$PackageListPath" ]]; then
 
 elif [[ -z "$(ls -A "$PackageListPath" 2>/dev/null)" ]]; then
 
+        echo -e "\033[38;5;9mError MisListFiles : The package list folder is empty." >> $LogFile
+        read -t 300 -p "The script will exit in 5 min or when a key is pressed." >> $LogFile
+        echo -e "Exiting with error MisListFiles...\033[0m" >> $LogFile
         echo -e "\033[38;5;9mError MisListFiles : The package list folder is empty."
         read -t 300 -p "The script will exit in 5 min or when a key is pressed."
         echo -e "Exiting with error MisListFiles...\033[0m"
@@ -114,14 +132,14 @@ for JsonFiles in "$PackageListPath"* ; do
 done
 
 
-echo "Total packages processed : "$((PackageCounter))
+echo "Total packages processed : "$((PackageCounter)) >> $LogFile
 
 # Gets PackageCounter from 1 to xIterations to 0 to x-1Iterations for next loops
 #PackageCounter=$((PackageCounter - 1))
 
 
 # Fetch latest release and compare it
-echo "Fetch latest release and compare it"
+echo "Fetch latest release and compare it" >> $LogFile
 CurlIteration=0
 PackageLink=""
 PackageVersionSearch=""
@@ -139,14 +157,14 @@ while [ $CurlIteration != $PackageCounter ] ; do
 
 	# Compare
 	if [ "$FetchedLatest" != "$PackageCurrentVersion" ]; then
-		echo "Update detected for package : $PackageMessage"
-		echo "Current : $PackageCurrentVersion ; Latest : $FetchedLatest"
+		echo "Update detected for package : $PackageMessage" >> $LogFile
+		echo "Current : $PackageCurrentVersion ; Latest : $FetchedLatest" >> $LogFile
 
 		UpdAte=$UpdAte"\nNew version found for "${PackageMessage}" : "${PackageCurrentVersion}" -> "${FetchedLatest}
 		PackageArrays["$CurlIteration:FetchedCurrentVersion"]="$FetchedLatest"
 		PackageCurrentFilePath="${PackageFilesArray[$CurlIteration]}"
-		jq ".package.currentversion = \"$FetchedLatest\"" "$PackageCurrentFilePath" > tmp.$$.json && mv tmp.$$.json "$PackageCurrentFilePath"
-		echo $PackageCurrentFilePath
+		jq ".package.currentversion = \"$FetchedLatest\"" "$PackageCurrentFilePath" > /tmp/PUCA/tmp.$$.json && mv /tmp/PUCA/tmp.$$.json "$PackageCurrentFilePath"
+		echo $PackageCurrentFilePath >> $LogFile
 
 	fi
 
@@ -163,11 +181,17 @@ if [ "${UpdAte}" != "There is an update for :" ] ; then
 	# Need to implement the updater
 
 	curl --url $MailProtocol'://'$MailServ':'$MailPort $MailProtocolReq --mail-from $MailFrom --mail-rcpt $MailTo --user $MailFrom':'$MailPass -T <(echo -e 'From:'$MailFrom'\nTo:'$MailTo'\nSubject:PUCA - Package Update Checker Alert\n\n'$UpdAte)
-	echo "List of package to update sent :"
-	echo -e $UpdAte
+	echo "List of package to update sent :" >> $LogFile
+	echo -e $UpdAte >> $LogFile
 
 else
 
-	echo "No updates, nothing was sent"
+	echo "No updates, nothing was sent" >> $LogFile
 
 fi
+
+rm -rf /tmp/PUCA/
+
+echo "Done." >> $LogFile
+
+exit 0
