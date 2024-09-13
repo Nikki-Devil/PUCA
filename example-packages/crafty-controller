@@ -1,8 +1,8 @@
 {
-        "package": {
-                "link": "https://gitlab.com/api/v4/projects/20430749/releases/",
-		"curlend": "-s | jq '.[]' | jq -r '.name' | head -1 | awk '{print substr($2, 1) }')",
-                "message": "Crafty Controller : ",
-                "currentversion": "NONE"
+  "package": {
+    "link": "https://gitlab.com/api/v4/projects/20430749/releases/",
+    "search": "jq '.[]' | jq -r '.name' | head -1 | awk '{print substr($2, 1) }'",
+    "message": "Crafty Controller",
+    "currentversion": "NONE"
   }
 }

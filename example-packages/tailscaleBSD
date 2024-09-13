@@ -1,8 +1,8 @@
 {
         "package": {
                 "link": "https://raw.githubusercontent.com/freebsd/freebsd-ports/master/security/tailscale/distinfo",
-                "curlend": "-s | grep 'SIZE' | grep '.zip' | awk '{print substr($2, 34, length($2)-38) }')",
-                "message": "BSD's Tailscale : ",
+                "search": "grep 'SIZE' | grep '.zip' | awk '{print substr($2, 34, length($2)-38) }'",
+                "message": "BSD's Tailscale",
                 "currentversion": "NONE"
   }
 }

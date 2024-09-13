@@ -1,8 +1,8 @@
 {
         "package": {
                 "link": "https://api.github.com/repos/rustdesk/rustdesk/releases/latest",
-                "curlend": "-s | grep 'tag_name' | awk '{print substr($2, 2, length($2)-3) }')",
-                "message": "Rustdesk Client : ",
+                "search": "grep 'tag_name' | awk '{print substr($2, 2, length($2)-3) }'",
+                "message": "Rustdesk Client",
                 "currentversion": "NONE"
   }
 }
