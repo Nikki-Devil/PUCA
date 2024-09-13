@@ -16,4 +16,3 @@ It's used to check a configurable list of packages and send an email via Curl re
 	- Support for different linux package manager ? (snap, flatpak)
 	- SSH Windows support ? (winget, chocolatey)
 	- Support for FreeBSD based OS (pkg)
-- Default package config file list
