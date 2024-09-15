@@ -1,0 +1,8 @@
+{
+  "package": {
+    "link": "https://api.github.com/repos/pbatard/rufus/releases/latest/",
+    "search": "grep 'tag_name' | awk '{print substr($2, 2, length($2)-3) }'",
+    "message": "Rufus",
+    "currentversion": ""
+  }
+}
