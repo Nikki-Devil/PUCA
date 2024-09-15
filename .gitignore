@@ -9,4 +9,4 @@ updater.conf
 *-v
 
 ## Ignore logs
-log
+logs
