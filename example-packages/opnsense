@@ -1,0 +1,8 @@
+{
+	"package": {
+		"link": "https://opnsense.org/download/",
+		"search": "grep 'data-version' | awk '{print substr($9, 15, length($9)-16)}'",
+		"message": "OPNsense",
+		"currentversion": "NONE"
+  }
+}
