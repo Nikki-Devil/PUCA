@@ -1,5 +1,5 @@
 #!/bin/bash
-# Check mail.conf and set curl's mailing settings accordingly
+# Make log file
 RunningFolder=$(pwd)
 if [[ ! -d "RunningFolder/logs" ]]; then
 
@@ -10,6 +10,7 @@ fi
 RunningDate=$(date "+%Y.%m.%d-%H:%M")
 LogFile=$(echo "logs/$RunningDate")
 
+# Check mail.conf and set curl's mailing settings accordingly
 echo "Setting up Mailing configs" >> $LogFile
 
 mkdir /tmp/PUCA/
@@ -74,7 +75,6 @@ elif  [ "${AskMailPass}" = "file" ] ; then
 
 	fi
 
-# Misconfig error
 else
 
         echo -e "\033[38;5;9mError MisAskPass : pass.conf is misconfigured.\nThe password will be set to 'NONE'\033[0m" >> $LogFile
@@ -88,7 +88,7 @@ fi
 # Need to implement updater
 
 
-# Fetch package list
+# Set package list conf
 echo "Setting package list" >> $LogFile
 PackageList=''
 PackageCounter=0
@@ -104,7 +104,7 @@ if [[ ! -d "$PackageListPath" ]]; then
 	echo -e "\033[38;5;9mError MisListPath : The package list folder doesn't exist."
 	read -t 300 -p "The script will exit in 5 min or when a key is pressed."
 	echo -e "Exiting with error MisListPath...\033[0m"
-	exit
+	exit 1
 
 elif [[ -z "$(ls -A "$PackageListPath" 2>/dev/null)" ]]; then
 
@@ -114,10 +114,12 @@ elif [[ -z "$(ls -A "$PackageListPath" 2>/dev/null)" ]]; then
         echo -e "\033[38;5;9mError MisListFiles : The package list folder is empty."
         read -t 300 -p "The script will exit in 5 min or when a key is pressed."
         echo -e "Exiting with error MisListFiles...\033[0m"
-        exit
+        exit 1
 
 fi
 
+
+# Fetch package info
 PackageFilesArray=("$PackageListPath"*)
 for JsonFiles in "$PackageListPath"* ; do
 
@@ -133,9 +135,6 @@ done
 
 
 echo "Total packages processed : "$((PackageCounter)) >> $LogFile
-
-# Gets PackageCounter from 1 to xIterations to 0 to x-1Iterations for next loops
-#PackageCounter=$((PackageCounter - 1))
 
 
 # Fetch latest release and compare it
@@ -169,6 +168,7 @@ while [ $CurlIteration != $PackageCounter ] ; do
 	fi
 
 	CurlIteration=$((CurlIteration + 1))
+	# Buffer for Github's API
 	read -t 2
 
 done
@@ -190,6 +190,7 @@ else
 
 fi
 
+# Clean tmp folder
 rm -rf /tmp/PUCA/
 
 echo "Done." >> $LogFile
