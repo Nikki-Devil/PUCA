@@ -1,7 +1,7 @@
 {
         "package": {
                 "link": "https://raw.githubusercontent.com/tailscale/tailscale-android/main/android/build.gradle",
-                "search": "grep 'versionName' | grep -oE '"[0-9.]+-' | awk '{print substr($0, 2, length($0)-3)}'",
+                "search": "grep 'versionName' | grep -oE '\"[0-9.]+-' | awk '{print substr($0, 2, length($0)-3)}'",
                 "message": "Android's Tailscale",
                 "currentversion": "NONE"
   }
