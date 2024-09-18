@@ -1,6 +1,6 @@
 {
   "package": {
-    "link": "https://api.github.com/repos/requarks/wiki/releases/latest/",
+    "link": "https://api.github.com/repos/requarks/wiki/releases/latest",
     "search": "grep 'tag_name' | awk '{print substr($2, 2, length($2)-3) }'",
     "message": "WikiJS",
     "currentversion": ""
